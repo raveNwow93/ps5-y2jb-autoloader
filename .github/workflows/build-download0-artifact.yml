@@ -24,7 +24,7 @@ jobs:
           python-version: "3.x"
 
       - name: Build update package
-        run: ./build.sh --dev --download-deps
+        run: bash ./build.sh --dev --download-deps
 
       - name: Assemble YouTube download0 tree
         shell: bash
