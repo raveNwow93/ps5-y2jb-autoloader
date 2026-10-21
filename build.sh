@@ -73,7 +73,7 @@ build_source_deps() {
 # Helper to download dependencies
 download_prebuilt_deps() {
     echo "=== Downloading dependencies from GitHub releases ==="
-    ./scripts/download_deps.sh
+    bash ./scripts/download_deps.sh
 }
 
 # Resolve dependency action
