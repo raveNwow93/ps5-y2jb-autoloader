@@ -153,151 +153,220 @@ function trigger() {
     };
 
     window.autoloader_ui = function() {
-        if (document.getElementById("autoloader_ui")) {
-            const existing_ui = document.getElementById("autoloader_ui");
-            existing_ui.parentNode.removeChild(existing_ui);
-        }
+        const previous = document.getElementById("autoloader_ui");
+        if (previous && previous.parentNode) previous.parentNode.removeChild(previous);
 
-        const baseWidth = 1920;
-        const baseHeight = 1080;
-        const scale = window.innerWidth / baseWidth;
+        const W = 1920, H = 1080;
+        const scale = window.innerWidth / W;
+        const root = document.createElement("div");
+        root.id = "autoloader_ui";
+        Object.assign(root.style, {
+            position: "fixed", top: "0", left: "0", width: W + "px", height: H + "px",
+            transform: "scale(" + scale + ")", transformOrigin: "top left",
+            zIndex: "9999", overflow: "hidden", fontFamily: "Arial, Helvetica, sans-serif",
+            color: "#f7f8ff",
+            background: "radial-gradient(ellipse at 50% 42%,rgba(35,69,130,.48) 0%,rgba(10,20,44,.48) 30%,transparent 65%),linear-gradient(135deg,#03050b 0%,#080f20 48%,#02040a 100%)"
+        });
 
-        const autoloader_ui = document.createElement("div");
-        autoloader_ui.id = "autoloader_ui";
-        autoloader_ui.style.position = "fixed";
-        autoloader_ui.style.top = "0px";
-        autoloader_ui.style.left = "0px";
-        autoloader_ui.style.width = baseWidth + "px";
-        autoloader_ui.style.height = baseHeight + "px";
-        autoloader_ui.style.transform = "scale(" + scale + ")";
-        autoloader_ui.style.transformOrigin = "top left";
-        autoloader_ui.style.zIndex = "9999";
-        autoloader_ui.style.backgroundColor = "#272727";
-        autoloader_ui.style.border = "1px solid black";
-        autoloader_ui.style.padding = "5px";
-        autoloader_ui.style.fontFamily = "Arial, sans-serif";
-        autoloader_ui.style.fontSize = "8px";
+        // Lightweight CSS-only background artwork: no external request or image decode.
+        const glow = document.createElement("div");
+        Object.assign(glow.style, {
+            position: "absolute", top: "-18%", left: "-10%", right: "-10%", bottom: "-18%",
+            background: "radial-gradient(ellipse at 18% 82%,rgba(25,86,180,.22),transparent 35%),radial-gradient(ellipse at 82% 18%,rgba(80,115,190,.17),transparent 34%),radial-gradient(ellipse at 50% 55%,rgba(15,32,70,.5),transparent 52%)",
+            pointerEvents: "none"
+        });
+        root.appendChild(glow);
 
-        const title = document.createElement("div");
-        title.textContent = "Y2JB Autoloader";
-        title.style.fontFamily = "monospace";
-        title.style.textAlign = "center";
-        title.style.fontWeight = "bold";
-        title.style.color = "#ccc";
-        title.style.padding = "10px";
-        title.style.borderRadius = "8px";
-        title.style.marginBottom = "5px";
-        title.style.fontSize = "42px";
-        title.style.marginTop = "60px";
-        autoloader_ui.appendChild(title);
+        const wave1 = document.createElement("div");
+        Object.assign(wave1.style, {
+            position: "absolute", left: "-8%", top: "23%", width: "116%", height: "50%",
+            borderTop: "2px solid rgba(180,207,255,.15)", borderRadius: "50%",
+            transform: "rotate(-9deg)", pointerEvents: "none",
+            boxShadow: "0 -12px 36px rgba(70,130,230,.07),inset 0 18px 35px rgba(70,130,230,.035)"
+        });
+        root.appendChild(wave1);
+        const wave2 = document.createElement("div");
+        Object.assign(wave2.style, {
+            position: "absolute", left: "-12%", top: "30%", width: "124%", height: "48%",
+            borderTop: "1px solid rgba(210,225,255,.10)", borderRadius: "50%",
+            transform: "rotate(7deg)", pointerEvents: "none"
+        });
+        root.appendChild(wave2);
 
-        const logWrapper = document.createElement("div");
-        logWrapper.style.width = "62%";
-        logWrapper.style.height = "62%";        
-        logWrapper.style.position = "relative";
-        logWrapper.style.margin = "20px auto 0 auto";
-        logWrapper.style.padding = "0px";
-        logWrapper.style.color = "#ccc";
-        logWrapper.style.backgroundColor = "#000";
-        logWrapper.style.fontFamily = "monospace";
-        logWrapper.style.fontSize = "28px";
-        logWrapper.style.overflow = "hidden";
-        logWrapper.style.border = "2px solid red";
-        logWrapper.style.borderRadius = "8px";
-        logWrapper.style.overflowY = "scroll";
-        logWrapper.id = "logWrapper";
-        autoloader_ui.appendChild(logWrapper);
+        const header = document.createElement("div");
+        Object.assign(header.style, {
+            position: "absolute", top: "42px", left: "54px", right: "54px",
+            display: "flex", alignItems: "center", justifyContent: "space-between", zIndex: "2"
+        });
+        root.appendChild(header);
 
+        const brand = document.createElement("div");
+        Object.assign(brand.style, { display: "flex", alignItems: "center", gap: "18px" });
+        header.appendChild(brand);
+
+        const tile = document.createElement("div");
+        Object.assign(tile.style, {
+            width: "76px", height: "76px", borderRadius: "15px",
+            background: "linear-gradient(145deg,rgba(255,255,255,.15),rgba(255,255,255,.035))",
+            border: "1px solid rgba(255,255,255,.32)",
+            boxShadow: "0 0 22px rgba(116,166,255,.20),inset 0 1px 0 rgba(255,255,255,.16)",
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+            boxSizing: "border-box"
+        });
+        brand.appendChild(tile);
+        const playBox = document.createElement("div");
+        Object.assign(playBox.style, {
+            width: "31px", height: "22px", borderRadius: "7px", background: "#fff",
+            display: "flex", alignItems: "center", justifyContent: "center"
+        });
+        const triangle = document.createElement("div");
+        Object.assign(triangle.style, {
+            width: "0", height: "0", marginLeft: "3px",
+            borderTop: "6px solid transparent", borderBottom: "6px solid transparent",
+            borderLeft: "9px solid #0a1428"
+        });
+        playBox.appendChild(triangle);
+        tile.appendChild(playBox);
+        const tileText = document.createElement("div");
+        tileText.textContent = "Y2JB";
+        Object.assign(tileText.style, {
+            marginTop: "4px", fontSize: "12px", fontWeight: "800", letterSpacing: "1.5px", color: "#fff"
+        });
+        tile.appendChild(tileText);
+
+        const headingWrap = document.createElement("div");
+        Object.assign(headingWrap.style, { display: "flex", flexDirection: "column", gap: "7px" });
+        brand.appendChild(headingWrap);
+        const heading = document.createElement("div");
+        heading.textContent = "Y2JB Autoloader";
+        Object.assign(heading.style, {
+            fontSize: "34px", lineHeight: "1.05", fontWeight: "700", color: "#fff",
+            textShadow: "0 0 22px rgba(140,180,255,.16)"
+        });
+        headingWrap.appendChild(heading);
+        const version = document.createElement("div");
+        version.textContent = "v" + autoloader_version + "  •  by itsPLK";
+        Object.assign(version.style, {
+            fontSize: "17px", letterSpacing: "1.5px", color: "rgba(222,231,249,.68)"
+        });
+        headingWrap.appendChild(version);
+
+        const credit = document.createElement("div");
+        credit.textContent = "design by raveN";
+        Object.assign(credit.style, {
+            fontSize: "18px", letterSpacing: "2px", fontWeight: "600",
+            color: "rgba(244,248,255,.92)", textShadow: "0 0 16px rgba(135,180,255,.85)"
+        });
+        header.appendChild(credit);
+
+        // Low-opacity emblem-like centrepiece, built from native text/CSS only.
+        const emblem = document.createElement("div");
+        Object.assign(emblem.style, {
+            position: "absolute", left: "50%", top: "46%", width: "510px", height: "360px",
+            transform: "translate(-50%,-50%)", display: "flex", alignItems: "center",
+            justifyContent: "center", opacity: ".22", zIndex: "1", pointerEvents: "none"
+        });
+        root.appendChild(emblem);
+        const ring = document.createElement("div");
+        Object.assign(ring.style, {
+            position: "absolute", width: "310px", height: "310px", borderRadius: "50%",
+            border: "1px solid rgba(190,216,255,.55)",
+            boxShadow: "0 0 45px rgba(55,119,220,.16),inset 0 0 45px rgba(55,119,220,.10)"
+        });
+        emblem.appendChild(ring);
+        const mark = document.createElement("div");
+        mark.textContent = "PS";
+        Object.assign(mark.style, {
+            fontSize: "150px", fontWeight: "300", letterSpacing: "-15px",
+            color: "#eaf2ff", fontFamily: "Arial,sans-serif",
+            textShadow: "0 0 32px rgba(180,210,255,.3)"
+        });
+        emblem.appendChild(mark);
+
+        // A single live status line replaces the old scrolling log in the visible overlay.
+        const statusPanel = document.createElement("div");
+        statusPanel.id = "logWrapper";
+        Object.assign(statusPanel.style, {
+            position: "absolute", left: "50%", top: "75%", transform: "translateX(-50%)",
+            width: "1120px", height: "66px", boxSizing: "border-box", padding: "0 28px",
+            display: "flex", alignItems: "center",
+            background: "linear-gradient(90deg,rgba(5,11,23,.82),rgba(18,31,55,.78),rgba(5,11,23,.82))",
+            border: "1px solid rgba(197,218,255,.30)", borderRadius: "13px",
+            boxShadow: "0 0 28px rgba(73,128,220,.13),inset 0 1px 0 rgba(255,255,255,.06)",
+            overflow: "hidden", zIndex: "3"
+        });
+        root.appendChild(statusPanel);
+        const dot = document.createElement("div");
+        Object.assign(dot.style, {
+            width: "9px", height: "9px", flex: "0 0 9px", marginRight: "18px",
+            borderRadius: "50%", background: "#dceaff", boxShadow: "0 0 14px rgba(180,210,255,.95)"
+        });
+        statusPanel.appendChild(dot);
         const logContainer = document.createElement("div");
         logContainer.id = "logContainer";
-        logContainer.style.position = "absolute";
-        logContainer.style.bottom = "0";
-        logContainer.style.padding = "10px";
-        logWrapper.appendChild(logContainer);
+        Object.assign(logContainer.style, {
+            flex: "1", minWidth: "0", whiteSpace: "nowrap", overflow: "hidden",
+            textOverflow: "ellipsis", color: "rgba(242,246,255,.92)", fontSize: "22px",
+            letterSpacing: ".2px"
+        });
+        statusPanel.appendChild(logContainer);
 
         const progressBarContainer = document.createElement("div");
-        progressBarContainer.style.width = "60%";
-        progressBarContainer.style.height = "100px";
-        progressBarContainer.style.backgroundColor = "#202020";
-        progressBarContainer.style.border = "2px solid red";
-        progressBarContainer.style.borderRadius = "16px";
-        progressBarContainer.style.margin = "0 auto";
-        progressBarContainer.style.overflow = "hidden";
-        progressBarContainer.style.position = "relative";
-        progressBarContainer.style.marginTop = "30px";
-        autoloader_ui.appendChild(progressBarContainer);
-
+        Object.assign(progressBarContainer.style, {
+            position: "absolute", left: "50%", top: "85%", transform: "translateX(-50%)",
+            width: "900px", height: "13px", background: "rgba(255,255,255,.12)",
+            border: "1px solid rgba(255,255,255,.28)", borderRadius: "99px", overflow: "hidden",
+            zIndex: "3", boxShadow: "0 0 18px rgba(110,160,255,.10)"
+        });
+        root.appendChild(progressBarContainer);
+        const progressBar = document.createElement("div");
+        progressBar.id = "progressBar";
+        Object.assign(progressBar.style, {
+            width: "100%", height: "100%",
+            background: "linear-gradient(90deg,#b8d5ff,#ffffff 65%,#dbe8ff)",
+            transformOrigin: "left", transform: "scaleX(0)", transition: "transform .45s ease",
+            borderRadius: "99px", boxShadow: "0 0 16px rgba(225,239,255,.9)"
+        });
+        progressBarContainer.appendChild(progressBar);
         const progressLabel = document.createElement("div");
         progressLabel.id = "progressLabel";
         progressLabel.textContent = "Loading...";
-        progressLabel.style.position = "absolute";
-        progressLabel.style.top = "50%";
-        progressLabel.style.left = "50%";
-        progressLabel.style.transform = "translate(-50%, -50%)";
-        progressLabel.style.color = "#fff";
-        progressLabel.style.fontSize = "42px";
-        progressLabel.style.fontWeight = "bold";
-        progressLabel.style.zIndex = "1";
-        progressBarContainer.appendChild(progressLabel);
-
-        const progressBar = document.createElement("div");
-        progressBar.id = "progressBar";
-        progressBar.style.width = "100%";
-        progressBar.style.height = "100%";
-        progressBar.style.backgroundColor = "#aa0000";
-        progressBar.style.transformOrigin = "left";
-        progressBar.style.transform = "scaleX(0)";
-        progressBar.style.transition = "transform 0.5s ease-in-out";
-        progressBarContainer.appendChild(progressBar);
-
-        document.body.appendChild(autoloader_ui);
+        Object.assign(progressLabel.style, {
+            position: "absolute", left: "50%", top: "88%", transform: "translateX(-50%)",
+            marginTop: "18px", fontSize: "15px", letterSpacing: "2px",
+            color: "rgba(220,231,250,.58)", zIndex: "3"
+        });
+        root.appendChild(progressLabel);
+        document.body.appendChild(root);
     };
 
     window.updateProgress = function(percent, message="Loading...") {
-        const progressBar = document.getElementById("progressBar");
-        if (progressBar) {
-            progressBar.style.transform = 'scaleX(' + percent/100 + ')';
+        const bar = document.getElementById("progressBar");
+        if (bar) {
+            const safePercent = Math.max(0, Math.min(100, Number(percent) || 0));
+            bar.style.transform = "scaleX(" + safePercent / 100 + ")";
         }
-        const progressLabel = document.getElementById("progressLabel");
-        if (progressLabel) {
-            progressLabel.textContent = message;
-        }
+        const label = document.getElementById("progressLabel");
+        if (label) label.textContent = String(message);
         window.uiLog(message, "warning");
     };
 
     window.uiLog = function(message, type="info") {
-        if (typeof message === 'string' && (message.includes("[ERROR]") || message.includes("[-]"))) {
-            if (typeof window.hideUI === 'function') window.hideUI();
+        if (typeof message === "string" && (message.includes("[ERROR]") || message.includes("[-]"))) {
+            if (typeof window.hideUI === "function") window.hideUI();
         }
         const logContainer = document.getElementById("logContainer");
         if (logContainer) {
-            const logEntry = document.createElement("div");
-            if (type === "error") {
-                logEntry.style.color = "red";
-            } else if (type === "success") {
-                logEntry.style.color = "lightgreen";
-            } else if (type === "warning") {
-                logEntry.style.color = "yellow";
-            } else {
-                logEntry.style.color = "#ccc";
-            }
-            logEntry.textContent = message;
-            logContainer.appendChild(logEntry);
-            if (logContainer.childElementCount > 20) {
-                logContainer.removeChild(logContainer.firstChild);
-            }
-            const logWrapper = document.getElementById("logWrapper");
-            if (logWrapper) {
-                logWrapper.scrollTop = logWrapper.scrollHeight;
-            }
+            logContainer.textContent = String(message);
+            logContainer.style.color = type === "error" ? "#ffb8b8" :
+                type === "success" ? "#d8ffe3" :
+                type === "warning" ? "#f1f5ff" : "rgba(242,246,255,.92)";
         }
     };
 
     window.hideUI = function() {
-        if (document.getElementById("autoloader_ui")) {
-            const existing_ui = document.getElementById("autoloader_ui");
-            existing_ui.parentNode.removeChild(existing_ui);
-        }
+        const existing = document.getElementById("autoloader_ui");
+        if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
     };
 
     try {
