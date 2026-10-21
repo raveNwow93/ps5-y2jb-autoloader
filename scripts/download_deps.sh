@@ -34,7 +34,12 @@ resolve_dep_release_url() {
     fi
 
     local pinned_hash=""
-    pinned_hash=$(git rev-parse ":$submodule_dir" 2>/dev/null | cut -c1-7 || git ls-tree HEAD "$submodule_dir" 2>/dev/null | awk '{print $3}' | cut -c1-7 || true)
+    if [ -e "$submodule_dir/.git" ]; then
+        pinned_hash=$(git -C "$submodule_dir" rev-parse --short=7 HEAD 2>/dev/null || true)
+    fi
+    if [ -z "$pinned_hash" ]; then
+        pinned_hash=$(git ls-tree HEAD "$submodule_dir" 2>/dev/null | awk '{print $3}' | cut -c1-7 || true)
+    fi
 
     local url=""
     if [ -n "$tag" ]; then
