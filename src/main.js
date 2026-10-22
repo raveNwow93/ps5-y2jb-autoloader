@@ -77,37 +77,20 @@ const leftPadding = Math.floor((baseWidth * 0.005) * scale);
 const topPadding = Math.floor((baseHeight * 0.005) * scale);
 
 async function log(msg) {
-    let message = String(msg);
-    if (!outputElement) {
-        outputElement = document.getElementById('output');
-        if (!outputElement) {
-            outputElement = document.createElement('div');
-            outputElement.id = 'output';
-            document.body.appendChild(outputElement);
-        }
-        outputElement.style.paddingLeft = leftPadding + 'px';
-        outputElement.style.paddingTop = topPadding + 'px'; 
+    const message = String(msg);
+
+    if (typeof window.uiLog === 'function') {
+        const displayMessage = message.replace(/[\r\n]+/g, ' ').trim();
+        const type = /\[ERROR\]|\[-\]/.test(message) ? 'error' : 'info';
+        window.uiLog(displayMessage || '\u00A0', type);
     }
-    
-    const lines = message.split('\n');
-    lines.forEach(line => {
-        let lineDiv = document.createElement('div');
-        lineDiv.textContent = line === '' ? '\u00A0' : line;
-        lineDiv.style.fontSize = fontSize + 'px';
-        
-        outputElement.appendChild(lineDiv);
-    });
-    
-    while (outputElement.children.length > maxLines) {
-        outputElement.removeChild(outputElement.children[0]);
-    }
-    
+
     await new Promise(resolve => {
         requestAnimationFrame(() => {
             setTimeout(resolve, 1);
         });
     });
-        
+
     if (NETWORK_LOGGING) {
         try {
             await fetch(LOG_SERVER, {
@@ -117,7 +100,6 @@ async function log(msg) {
         } catch (e) { }
     }
 }
-
 function toHex(num) {
     return '0x' + BigInt(num).toString(16).padStart(16, '0');
 }
