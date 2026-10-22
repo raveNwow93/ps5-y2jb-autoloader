@@ -147,14 +147,14 @@ function trigger() {
             transform: "scale(" + scale + ")", transformOrigin: "top left",
             zIndex: "9999", overflow: "hidden", fontFamily: "Arial, Helvetica, sans-serif",
             color: "#f7f8ff",
-            background: "radial-gradient(ellipse at 50% 42%,rgba(35,69,130,.48) 0%,rgba(10,20,44,.48) 30%,transparent 65%),linear-gradient(135deg,#03050b 0%,#080f20 48%,#02040a 100%)"
+            background: "radial-gradient(ellipse at 50% 42%,rgba(255,255,255,.09) 0%,rgba(32,32,32,.24) 30%,transparent 65%),linear-gradient(135deg,#020202 0%,#101010 48%,#030303 100%)"
         });
 
         // Lightweight CSS-only background artwork: no external request or image decode.
         const glow = document.createElement("div");
         Object.assign(glow.style, {
             position: "absolute", top: "-18%", left: "-10%", right: "-10%", bottom: "-18%",
-            background: "radial-gradient(ellipse at 18% 82%,rgba(25,86,180,.22),transparent 35%),radial-gradient(ellipse at 82% 18%,rgba(80,115,190,.17),transparent 34%),radial-gradient(ellipse at 50% 55%,rgba(15,32,70,.5),transparent 52%)",
+            background: "radial-gradient(ellipse at 18% 82%,rgba(255,255,255,.08),transparent 35%),radial-gradient(ellipse at 82% 18%,rgba(255,255,255,.07),transparent 34%),radial-gradient(ellipse at 50% 55%,rgba(40,40,40,.34),transparent 52%)",
             pointerEvents: "none"
         });
         root.appendChild(glow);
@@ -162,15 +162,15 @@ function trigger() {
         const wave1 = document.createElement("div");
         Object.assign(wave1.style, {
             position: "absolute", left: "-8%", top: "23%", width: "116%", height: "50%",
-            borderTop: "2px solid rgba(180,207,255,.15)", borderRadius: "50%",
+            borderTop: "2px solid rgba(255,255,255,.20)", borderRadius: "50%",
             transform: "rotate(-9deg)", pointerEvents: "none",
-            boxShadow: "0 -12px 36px rgba(70,130,230,.07),inset 0 18px 35px rgba(70,130,230,.035)"
+            boxShadow: "0 -12px 36px rgba(255,255,255,.06),inset 0 18px 35px rgba(255,255,255,.025)"
         });
         root.appendChild(wave1);
         const wave2 = document.createElement("div");
         Object.assign(wave2.style, {
             position: "absolute", left: "-12%", top: "30%", width: "124%", height: "48%",
-            borderTop: "1px solid rgba(210,225,255,.10)", borderRadius: "50%",
+            borderTop: "1px solid rgba(255,255,255,.14)", borderRadius: "50%",
             transform: "rotate(7deg)", pointerEvents: "none"
         });
         root.appendChild(wave2);
@@ -241,29 +241,72 @@ function trigger() {
         });
         header.appendChild(credit);
 
-        // Low-opacity emblem-like centrepiece, built from native text/CSS only.
+        // Central YouTube-style loader emblem. Keep all artwork native to avoid external requests.
         const emblem = document.createElement("div");
         Object.assign(emblem.style, {
-            position: "absolute", left: "50%", top: "46%", width: "510px", height: "360px",
+            position: "absolute", left: "50%", top: "45%", width: "420px", height: "420px",
             transform: "translate(-50%,-50%)", display: "flex", alignItems: "center",
-            justifyContent: "center", opacity: ".22", zIndex: "1", pointerEvents: "none"
+            justifyContent: "center", opacity: "1", zIndex: "2", pointerEvents: "none"
         });
         root.appendChild(emblem);
+
         const ring = document.createElement("div");
+        ring.id = "jailbreakRing";
         Object.assign(ring.style, {
-            position: "absolute", width: "310px", height: "310px", borderRadius: "50%",
-            border: "1px solid rgba(190,216,255,.55)",
-            boxShadow: "0 0 45px rgba(55,119,220,.16),inset 0 0 45px rgba(55,119,220,.10)"
+            position: "absolute", width: "300px", height: "300px", boxSizing: "border-box",
+            borderRadius: "50%", border: "2px solid rgba(255,255,255,.78)",
+            boxShadow: "0 0 18px rgba(255,255,255,.28),0 0 48px rgba(255,255,255,.14),inset 0 0 32px rgba(255,255,255,.06)"
         });
         emblem.appendChild(ring);
+
         const mark = document.createElement("div");
-        mark.textContent = "PS";
+        mark.id = "jailbreakMark";
         Object.assign(mark.style, {
-            fontSize: "150px", fontWeight: "300", letterSpacing: "-15px",
-            color: "#eaf2ff", fontFamily: "Arial,sans-serif",
-            textShadow: "0 0 32px rgba(180,210,255,.3)"
+            width: "92px", height: "64px", borderRadius: "18px", background: "#fff",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            boxShadow: "0 0 30px rgba(255,255,255,.24)"
         });
+        const triangle = document.createElement("div");
+        Object.assign(triangle.style, {
+            width: "0", height: "0", marginLeft: "7px",
+            borderTop: "17px solid transparent", borderBottom: "17px solid transparent",
+            borderLeft: "27px solid #080808"
+        });
+        mark.appendChild(triangle);
         emblem.appendChild(mark);
+        ring.style.animation = "jailbreakPulse 2.4s ease-in-out infinite";
+
+        const animationStyle = document.createElement("style");
+        animationStyle.textContent = `
+            @keyframes jailbreakPulse {
+                0%, 100% {
+                    box-shadow: 0 0 18px rgba(255,255,255,.24),
+                                0 0 42px rgba(255,255,255,.12),
+                                inset 0 0 28px rgba(255,255,255,.04);
+                    border-color: rgba(255,255,255,.68);
+                }
+                50% {
+                    box-shadow: 0 0 26px rgba(255,255,255,.48),
+                                0 0 68px rgba(255,255,255,.22),
+                                inset 0 0 38px rgba(255,255,255,.09);
+                    border-color: rgba(255,255,255,1);
+                }
+            }
+        `;
+        root.appendChild(animationStyle);
+
+        const centralStatus = document.createElement("div");
+        centralStatus.id = "jailbreakStatus";
+        centralStatus.textContent = "Jailbreak - Loading";
+        Object.assign(centralStatus.style, {
+            position: "absolute", left: "50%", top: "64%",
+            transform: "translateX(-50%)", width: "700px",
+            textAlign: "center", fontSize: "25px", fontWeight: "600",
+            letterSpacing: "3px", color: "#fff",
+            textShadow: "0 0 12px rgba(255,255,255,.65), 0 0 28px rgba(255,255,255,.24)",
+            zIndex: "3", pointerEvents: "none"
+        });
+        root.appendChild(centralStatus);
 
         // A single live status line replaces the old scrolling log in the visible overlay.
         const statusPanel = document.createElement("div");
@@ -1285,7 +1328,42 @@ function trigger() {
         await start_autoload();
 
         if (typeof window.updateProgress === 'function') {
-            window.updateProgress(100, "Autoload finished.");
+            window.updateProgress(100, "Process complete • 100%");
+        }
+
+        // Success styling is applied only after the existing jailbreak checks and autoload.
+        const successStatus = document.getElementById("jailbreakStatus");
+        const successRing = document.getElementById("jailbreakRing");
+        const successMark = document.getElementById("jailbreakMark");
+        const successLabel = document.getElementById("progressLabel");
+        const successLog = document.getElementById("logContainer");
+        const successDot = document.querySelector("#logWrapper > div");
+
+        if (successStatus) {
+            successStatus.textContent = "Jailbreak - Succes";
+            successStatus.style.color = "#8dffb0";
+            successStatus.style.textShadow = "0 0 14px rgba(80,255,140,.8), 0 0 32px rgba(80,255,140,.38)";
+        }
+        if (successRing) {
+            successRing.style.animation = "none";
+            successRing.style.borderColor = "#76ff9b";
+            successRing.style.boxShadow = "0 0 24px rgba(80,255,140,.55), 0 0 70px rgba(80,255,140,.28), inset 0 0 36px rgba(80,255,140,.12)";
+        }
+        if (successMark) {
+            successMark.style.background = "#8dffb0";
+            successMark.style.boxShadow = "0 0 32px rgba(80,255,140,.55)";
+        }
+        if (successLabel) {
+            successLabel.textContent = "100%";
+            successLabel.style.color = "#8dffb0";
+        }
+        if (successLog) {
+            successLog.textContent = "Process complete";
+            successLog.style.color = "#8dffb0";
+        }
+        if (successDot) {
+            successDot.style.background = "#8dffb0";
+            successDot.style.boxShadow = "0 0 14px rgba(80,255,140,.95)";
         }
 
     } catch (e) {                
