@@ -147,34 +147,14 @@ function trigger() {
             transform: "scale(" + scale + ")", transformOrigin: "top left",
             zIndex: "9999", overflow: "hidden", fontFamily: "Arial, Helvetica, sans-serif",
             color: "#f7f8ff",
-            background: "radial-gradient(ellipse at 50% 42%,rgba(255,255,255,.09) 0%,rgba(32,32,32,.24) 30%,transparent 65%),linear-gradient(135deg,#020202 0%,#101010 48%,#030303 100%)"
+            backgroundColor: "#020305",
+            backgroundImage: "url('y2jb-background.png')",
+            backgroundSize: "100% 100%",
+            backgroundPosition: "center center",
+            backgroundRepeat: "no-repeat"
         });
 
-        // Lightweight CSS-only background artwork: no external request or image decode.
-        const glow = document.createElement("div");
-        Object.assign(glow.style, {
-            position: "absolute", top: "-18%", left: "-10%", right: "-10%", bottom: "-18%",
-            background: "radial-gradient(ellipse at 18% 82%,rgba(255,255,255,.08),transparent 35%),radial-gradient(ellipse at 82% 18%,rgba(255,255,255,.07),transparent 34%),radial-gradient(ellipse at 50% 55%,rgba(40,40,40,.34),transparent 52%)",
-            pointerEvents: "none"
-        });
-        root.appendChild(glow);
-
-        const wave1 = document.createElement("div");
-        Object.assign(wave1.style, {
-            position: "absolute", left: "-8%", top: "23%", width: "116%", height: "50%",
-            borderTop: "2px solid rgba(255,255,255,.20)", borderRadius: "50%",
-            transform: "rotate(-9deg)", pointerEvents: "none",
-            boxShadow: "0 -12px 36px rgba(255,255,255,.06),inset 0 18px 35px rgba(255,255,255,.025)"
-        });
-        root.appendChild(wave1);
-        const wave2 = document.createElement("div");
-        Object.assign(wave2.style, {
-            position: "absolute", left: "-12%", top: "30%", width: "124%", height: "48%",
-            borderTop: "1px solid rgba(255,255,255,.14)", borderRadius: "50%",
-            transform: "rotate(7deg)", pointerEvents: "none"
-        });
-        root.appendChild(wave2);
-
+        // Custom metallic background; remove the previous CSS wave overlays.
         const header = document.createElement("div");
         Object.assign(header.style, {
             position: "absolute", top: "42px", left: "54px", right: "54px",
@@ -234,12 +214,20 @@ function trigger() {
         headingWrap.appendChild(version);
 
         const credit = document.createElement("div");
-        credit.textContent = "design by raveN";
-        Object.assign(credit.style, {
-            fontSize: "18px", letterSpacing: "2px", fontWeight: "600",
-            color: "rgba(244,248,255,.92)", textShadow: "0 0 16px rgba(135,180,255,.85)"
-        });
-        header.appendChild(credit);
+	credit.textContent = "design by raveN";
+	Object.assign(credit.style, {
+    	flex: "0 0 auto",
+    	whiteSpace: "nowrap",
+    	display: "block",
+    	minWidth: "180px",
+    	textAlign: "right",
+    	fontSize: "18px",
+    	letterSpacing: "1px",
+    	fontWeight: "600",
+    	color: "rgba(244,248,255,.92)",
+    	textShadow: "0 0 16px rgba(135,180,255,.85)"
+	});
+	header.appendChild(credit);
 
         // Central YouTube-style loader emblem. Keep all artwork native to avoid external requests.
         const emblem = document.createElement("div");
