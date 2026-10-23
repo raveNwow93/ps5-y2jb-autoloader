@@ -1323,7 +1323,7 @@ function trigger() {
         }
 
         await start_update();
-        await start_icon_update();
+        // Disabled: preserve custom raveN XMB icon.
         await sleep(1000);
         await start_autoload();
 
