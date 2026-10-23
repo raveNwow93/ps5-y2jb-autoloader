@@ -172,10 +172,10 @@ function trigger() {
             width: "320px", height: "320px",
             boxSizing: "border-box", borderRadius: "50%",
             border: "12px solid transparent",
-            background: "conic-gradient(from 0deg, rgba(255,255,255,.06) 0deg, rgba(255,255,255,.12) 18deg, #fff 32deg, rgba(255,255,255,.95) 42deg, rgba(255,255,255,.12) 58deg, transparent 		72deg, transparent 88deg, rgba(255,255,255,.08) 100deg, rgba(255,255,255,.65) 116deg, #fff 128deg, rgba(255,255,255,.08) 143deg, transparent 158deg, transparent 178deg, 	rgba(255,255,255,.08) 190deg, rgba(255,255,255,.75) 207deg, #fff 218deg, rgba(255,255,255,.08) 234deg, transparent 250deg, transparent 268deg, rgba(255,255,255,.08) 280deg, 	rgba(255,255,255,.55) 296deg, #fff 307deg, rgba(255,255,255,.08) 324deg, transparent 340deg, transparent 360deg)",
+            background: "conic-gradient(from -90deg, #fff 0deg, #fff 0deg, rgba(255,255,255,.12) 0deg, rgba(255,255,255,.12) 360deg)",
             boxShadow: "0 0 22px rgba(255,255,255,.65), 0 0 55px rgba(255,255,255,.38), 0 0 100px rgba(255,255,255,.16)",
             filter: "drop-shadow(0 0 10px rgba(255,255,255,.75))",
-            animation: "jailbreakSpin 1.8s linear infinite",
+            animation: "jailbreakGlow 1.4s ease-in-out infinite",
             WebkitMask: "radial-gradient(closest-side, transparent calc(100% - 16px), #000 calc(100% - 15px))",
             mask: "radial-gradient(closest-side, transparent calc(100% - 16px), #000 calc(100% - 15px))",
         });
@@ -183,18 +183,9 @@ function trigger() {
 
         const animationStyle = document.createElement("style");
         animationStyle.textContent = `
-            @keyframes jailbreakSpin {
-                0% {
-                    transform: rotate(0deg);
-                    filter: drop-shadow(0 0 8px rgba(255,255,255,.65));
-                }
-                50% {
-                    filter: drop-shadow(0 0 20px rgba(255,255,255,1));
-                }
-                100% {
-                    transform: rotate(360deg);
-                    filter: drop-shadow(0 0 8px rgba(255,255,255,.65));
-                }
+            @keyframes jailbreakGlow {
+                0%, 100% { filter: drop-shadow(0 0 9px rgba(255,255,255,.55)); }
+                50% { filter: drop-shadow(0 0 22px rgba(255,255,255,.95)); }
             }
             @keyframes jailbreakInnerPulse {
                 0%, 100% {
@@ -231,84 +222,33 @@ function trigger() {
         });
         root.appendChild(centralStatus);
 
-        // A single live status line replaces the old scrolling log in the visible overlay.
-        const statusPanel = document.createElement("div");
-        statusPanel.id = "logWrapper";
-        Object.assign(statusPanel.style, {
-            position: "absolute", left: "7.6%", top: "66.3%", transform: "none",
-            width: "84.8%", height: "5.6%", boxSizing: "border-box", padding: "0 28px",
-            display: "flex", alignItems: "center",
-            background: "transparent",
-            border: "none", borderRadius: "0",
-            boxShadow: "none",
-            overflow: "hidden", zIndex: "3"
-        });
-        root.appendChild(statusPanel);
-        const dot = document.createElement("div");
-        Object.assign(dot.style, {
-            width: "9px", height: "9px", flex: "0 0 9px", marginRight: "18px",
-            borderRadius: "50%", background: "#dceaff", boxShadow: "0 0 14px rgba(180,210,255,.95)"
-        });
-        statusPanel.appendChild(dot);
-        const logContainer = document.createElement("div");
-        logContainer.id = "logContainer";
-        Object.assign(logContainer.style, {
-            flex: "1", minWidth: "0", whiteSpace: "nowrap", overflow: "hidden",
-            textOverflow: "ellipsis", color: "rgba(242,246,255,.92)", fontSize: "22px",
-            letterSpacing: ".2px"
-        });
-        statusPanel.appendChild(logContainer);
-
-        const progressBarContainer = document.createElement("div");
-        Object.assign(progressBarContainer.style, {
-            position: "absolute", left: "50%", top: "85%", transform: "translateX(-50%)",
-            width: "900px", height: "13px", background: "rgba(255,255,255,.12)",
-            border: "1px solid rgba(255,255,255,.28)", borderRadius: "99px", overflow: "hidden",
-            zIndex: "3", boxShadow: "0 0 18px rgba(110,160,255,.10)"
-        });
-        root.appendChild(progressBarContainer);
-        const progressBar = document.createElement("div");
-        progressBar.id = "progressBar";
-        Object.assign(progressBar.style, {
-            width: "100%", height: "100%",
-            background: "linear-gradient(90deg,#b8d5ff,#ffffff 65%,#dbe8ff)",
-            transformOrigin: "left", transform: "scaleX(0)", transition: "transform .45s ease",
-            borderRadius: "99px", boxShadow: "0 0 16px rgba(225,239,255,.9)"
-        });
-        progressBarContainer.appendChild(progressBar);
-        const progressLabel = document.createElement("div");
-        progressLabel.id = "progressLabel";
-        progressLabel.textContent = "Loading...";
-        Object.assign(progressLabel.style, {
-            position: "absolute", left: "50%", top: "88%", transform: "translateX(-50%)",
-            marginTop: "18px", fontSize: "15px", letterSpacing: "2px",
-            color: "rgba(220,231,250,.58)", zIndex: "3"
-        });
-        root.appendChild(progressLabel);
+        // Status and progress are displayed inside the central circular ring.
         document.body.appendChild(root);
     };
 
     window.updateProgress = function(percent, message="Loading...") {
-        const bar = document.getElementById("progressBar");
-        if (bar) {
-            const safePercent = Math.max(0, Math.min(100, Number(percent) || 0));
-            bar.style.transform = "scaleX(" + safePercent / 100 + ")";
+        const safePercent = Math.max(0, Math.min(100, Number(percent) || 0));
+        const ring = document.getElementById("jailbreakRing");
+        const status = document.getElementById("jailbreakStatus");
+
+        if (ring) {
+            const degrees = safePercent * 3.6;
+            ring.style.background =
+                "conic-gradient(from -90deg, #fff 0deg, #fff " + degrees +
+                "deg, rgba(255,255,255,.12) " + degrees +
+                "deg, rgba(255,255,255,.12) 360deg)";
         }
-        const label = document.getElementById("progressLabel");
-        if (label) label.textContent = String(message);
+        if (status) {
+            status.textContent = String(message);
+            status.style.fontSize = "21px";
+            status.style.letterSpacing = "1px";
+        }
         window.uiLog(message, "warning");
     };
 
     window.uiLog = function(message, type="info") {
         if (typeof message === "string" && (message.includes("[ERROR]") || message.includes("[-]"))) {
             if (typeof window.hideUI === "function") window.hideUI();
-        }
-        const logContainer = document.getElementById("logContainer");
-        if (logContainer) {
-            logContainer.textContent = String(message);
-            logContainer.style.color = type === "error" ? "#ffb8b8" :
-                type === "success" ? "#d8ffe3" :
-                type === "warning" ? "#f1f5ff" : "rgba(242,246,255,.92)";
         }
     };
 
@@ -1257,9 +1197,6 @@ function trigger() {
         // Success styling is applied only after the existing jailbreak checks and autoload.
         const successStatus = document.getElementById("jailbreakStatus");
         const successRing = document.getElementById("jailbreakRing");
-        const successLabel = document.getElementById("progressLabel");
-        const successLog = document.getElementById("logContainer");
-        const successDot = document.querySelector("#logWrapper > div");
 
         if (successStatus) {
             successStatus.textContent = "Jailbreak - Success";
@@ -1277,18 +1214,6 @@ function trigger() {
 
         if (successStatus) {
             successStatus.classList.remove("loading");
-        }
-        if (successLabel) {
-            successLabel.textContent = "100%";
-            successLabel.style.color = "#8dffb0";
-        }
-        if (successLog) {
-            successLog.textContent = "Process complete";
-            successLog.style.color = "#8dffb0";
-        }
-        if (successDot) {
-            successDot.style.background = "#8dffb0";
-            successDot.style.boxShadow = "0 0 14px rgba(80,255,140,.95)";
         }
 
     } catch (e) {                
