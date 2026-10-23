@@ -229,69 +229,92 @@ function trigger() {
 	});
 	header.appendChild(credit);
 
-        // Central YouTube-style loader emblem. Keep all artwork native to avoid external requests.
+
+        // Central animated jailbreak loader.
         const emblem = document.createElement("div");
         Object.assign(emblem.style, {
-            position: "absolute", left: "50%", top: "45%", width: "420px", height: "420px",
-            transform: "translate(-50%,-50%)", display: "flex", alignItems: "center",
-            justifyContent: "center", opacity: "1", zIndex: "2", pointerEvents: "none"
+            position: "absolute", left: "50%", top: "45%",
+            width: "460px", height: "460px",
+            transform: "translate(-50%,-50%)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            opacity: "1", zIndex: "2", pointerEvents: "none"
         });
         root.appendChild(emblem);
 
         const ring = document.createElement("div");
         ring.id = "jailbreakRing";
         Object.assign(ring.style, {
-            position: "absolute", width: "300px", height: "300px", boxSizing: "border-box",
-            borderRadius: "50%", border: "2px solid rgba(255,255,255,.78)",
-            boxShadow: "0 0 18px rgba(255,255,255,.28),0 0 48px rgba(255,255,255,.14),inset 0 0 32px rgba(255,255,255,.06)"
+            position: "absolute",
+            width: "320px", height: "320px",
+            boxSizing: "border-box", borderRadius: "50%",
+            border: "12px solid transparent",
+            background: "conic-gradient(from 0deg, rgba(255,255,255,.06) 0deg, rgba(255,255,255,.12) 18deg, #fff 32deg, rgba(255,255,255,.95) 42deg, rgba(255,255,255,.12) 58deg, transparent 		72deg, transparent 88deg, rgba(255,255,255,.08) 100deg, rgba(255,255,255,.65) 116deg, #fff 128deg, rgba(255,255,255,.08) 143deg, transparent 158deg, transparent 178deg, 	rgba(255,255,255,.08) 190deg, rgba(255,255,255,.75) 207deg, #fff 218deg, rgba(255,255,255,.08) 234deg, transparent 250deg, transparent 268deg, rgba(255,255,255,.08) 280deg, 	rgba(255,255,255,.55) 296deg, #fff 307deg, rgba(255,255,255,.08) 324deg, transparent 340deg, transparent 360deg)",
+            boxShadow: "0 0 22px rgba(255,255,255,.65), 0 0 55px rgba(255,255,255,.38), 0 0 100px rgba(255,255,255,.16)",
+            filter: "drop-shadow(0 0 10px rgba(255,255,255,.75))",
+            animation: "jailbreakSpin 1.8s linear infinite",
+            WebkitMask: "radial-gradient(closest-side, transparent calc(100% - 16px), #000 calc(100% - 15px))",
+            mask: "radial-gradient(closest-side, transparent calc(100% - 16px), #000 calc(100% - 15px))",
         });
         emblem.appendChild(ring);
 
-        const mark = document.createElement("div");
-        mark.id = "jailbreakMark";
-        Object.assign(mark.style, {
-            width: "92px", height: "64px", borderRadius: "18px", background: "#fff",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            boxShadow: "0 0 30px rgba(255,255,255,.24)"
+        const innerRing = document.createElement("div");
+        innerRing.id = "jailbreakInnerRing";
+        Object.assign(innerRing.style, {
+            position: "absolute",
+            width: "270px", height: "270px",
+            borderRadius: "50%", boxSizing: "border-box",
+            border: "2px solid rgba(255,255,255,.25)",
+            boxShadow: "inset 0 0 28px rgba(255,255,255,.08), 0 0 22px rgba(255,255,255,.15)",
+            animation: "jailbreakInnerPulse 1.2s ease-in-out infinite"
         });
-        const logoTriangle = document.createElement("div");
-        Object.assign(logoTriangle.style, {
-            width: "0", height: "0", marginLeft: "7px",
-            borderTop: "17px solid transparent", borderBottom: "17px solid transparent",
-            borderLeft: "27px solid #080808"
-        });
-        mark.appendChild(logoTriangle);
-        emblem.appendChild(mark);
-        ring.style.animation = "jailbreakPulse 2.4s ease-in-out infinite";
+        emblem.appendChild(innerRing);
 
         const animationStyle = document.createElement("style");
         animationStyle.textContent = `
-            @keyframes jailbreakPulse {
-                0%, 100% {
-                    box-shadow: 0 0 18px rgba(255,255,255,.24),
-                                0 0 42px rgba(255,255,255,.12),
-                                inset 0 0 28px rgba(255,255,255,.04);
-                    border-color: rgba(255,255,255,.68);
+            @keyframes jailbreakSpin {
+                0% {
+                    transform: rotate(0deg);
+                    filter: drop-shadow(0 0 8px rgba(255,255,255,.65));
                 }
                 50% {
-                    box-shadow: 0 0 26px rgba(255,255,255,.48),
-                                0 0 68px rgba(255,255,255,.22),
-                                inset 0 0 38px rgba(255,255,255,.09);
-                    border-color: rgba(255,255,255,1);
+                    filter: drop-shadow(0 0 20px rgba(255,255,255,1));
                 }
+                100% {
+                    transform: rotate(360deg);
+                    filter: drop-shadow(0 0 8px rgba(255,255,255,.65));
+                }
+            }
+            @keyframes jailbreakInnerPulse {
+                0%, 100% {
+                    opacity: .45;
+                    box-shadow: inset 0 0 18px rgba(255,255,255,.04), 0 0 12px rgba(255,255,255,.12);
+                }
+                50% {
+                    opacity: 1;
+                    box-shadow: inset 0 0 30px rgba(255,255,255,.12), 0 0 28px rgba(255,255,255,.32);
+                }
+            }
+            @keyframes jailbreakTextBlink {
+                0%, 100% { opacity: 1; }
+                50% { opacity: .28; }
+            }
+            #jailbreakStatus.loading {
+                animation: jailbreakTextBlink 1.2s ease-in-out infinite;
             }
         `;
         root.appendChild(animationStyle);
 
         const centralStatus = document.createElement("div");
         centralStatus.id = "jailbreakStatus";
+        centralStatus.className = "loading";
         centralStatus.textContent = "Jailbreak - Loading";
         Object.assign(centralStatus.style, {
-            position: "absolute", left: "50%", top: "64%",
-            transform: "translateX(-50%)", width: "700px",
-            textAlign: "center", fontSize: "25px", fontWeight: "600",
+            position: "absolute", left: "50%", top: "45%",
+            transform: "translate(-50%,-50%)",
+            width: "600px", textAlign: "center",
+            fontSize: "25px", fontWeight: "700",
             letterSpacing: "3px", color: "#fff",
-            textShadow: "0 0 12px rgba(255,255,255,.65), 0 0 28px rgba(255,255,255,.24)",
+            textShadow: "0 0 12px rgba(255,255,255,.9), 0 0 28px rgba(255,255,255,.65), 0 0 48px rgba(255,255,255,.28)",
             zIndex: "3", pointerEvents: "none"
         });
         root.appendChild(centralStatus);
@@ -1328,18 +1351,28 @@ function trigger() {
         const successDot = document.querySelector("#logWrapper > div");
 
         if (successStatus) {
-            successStatus.textContent = "Jailbreak - Succes";
+            successStatus.textContent = "Jailbreak - Success";
             successStatus.style.color = "#8dffb0";
             successStatus.style.textShadow = "0 0 14px rgba(80,255,140,.8), 0 0 32px rgba(80,255,140,.38)";
         }
         if (successRing) {
             successRing.style.animation = "none";
+            successRing.style.background = "conic-gradient(from 0deg, #8dffb0, #37e875, #d8ffe3, #37e875, #8dffb0)";
             successRing.style.borderColor = "#76ff9b";
-            successRing.style.boxShadow = "0 0 24px rgba(80,255,140,.55), 0 0 70px rgba(80,255,140,.28), inset 0 0 36px rgba(80,255,140,.12)";
+            successRing.style.boxShadow = "0 0 28px rgba(80,255,140,.8), 0 0 70px rgba(80,255,140,.5), 0 0 110px rgba(80,255,140,.22)";
+            successRing.style.filter = "drop-shadow(0 0 14px rgba(80,255,140,.85))";
         }
-        if (successMark) {
-            successMark.style.background = "#8dffb0";
-            successMark.style.boxShadow = "0 0 32px rgba(80,255,140,.55)";
+
+        const successInnerRing = document.getElementById("jailbreakInnerRing");
+        if (successInnerRing) {
+            successInnerRing.style.animation = "none";
+            successInnerRing.style.opacity = "1";
+            successInnerRing.style.borderColor = "rgba(118,255,155,.8)";
+            successInnerRing.style.boxShadow = "inset 0 0 30px rgba(80,255,140,.2), 0 0 30px rgba(80,255,140,.4)";
+        }
+
+        if (successStatus) {
+            successStatus.classList.remove("loading");
         }
         if (successLabel) {
             successLabel.textContent = "100%";
