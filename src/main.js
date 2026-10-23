@@ -154,82 +154,6 @@ function trigger() {
             backgroundRepeat: "no-repeat"
         });
 
-        // Custom metallic background; remove the previous CSS wave overlays.
-        const header = document.createElement("div");
-        Object.assign(header.style, {
-            position: "absolute", top: "42px", left: "54px", right: "54px",
-            display: "flex", alignItems: "center", justifyContent: "space-between", zIndex: "2"
-        });
-        root.appendChild(header);
-
-        const brand = document.createElement("div");
-        Object.assign(brand.style, { display: "flex", alignItems: "center", gap: "18px" });
-        header.appendChild(brand);
-
-        const tile = document.createElement("div");
-        Object.assign(tile.style, {
-            width: "76px", height: "76px", borderRadius: "15px",
-            background: "linear-gradient(145deg,rgba(255,255,255,.15),rgba(255,255,255,.035))",
-            border: "1px solid rgba(255,255,255,.32)",
-            boxShadow: "0 0 22px rgba(116,166,255,.20),inset 0 1px 0 rgba(255,255,255,.16)",
-            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-            boxSizing: "border-box"
-        });
-        brand.appendChild(tile);
-        const playBox = document.createElement("div");
-        Object.assign(playBox.style, {
-            width: "31px", height: "22px", borderRadius: "7px", background: "#fff",
-            display: "flex", alignItems: "center", justifyContent: "center"
-        });
-        const triangle = document.createElement("div");
-        Object.assign(triangle.style, {
-            width: "0", height: "0", marginLeft: "3px",
-            borderTop: "6px solid transparent", borderBottom: "6px solid transparent",
-            borderLeft: "9px solid #0a1428"
-        });
-        playBox.appendChild(triangle);
-        tile.appendChild(playBox);
-        const tileText = document.createElement("div");
-        tileText.textContent = "Y2JB";
-        Object.assign(tileText.style, {
-            marginTop: "4px", fontSize: "12px", fontWeight: "800", letterSpacing: "1.5px", color: "#fff"
-        });
-        tile.appendChild(tileText);
-
-        const headingWrap = document.createElement("div");
-        Object.assign(headingWrap.style, { display: "flex", flexDirection: "column", gap: "7px" });
-        brand.appendChild(headingWrap);
-        const heading = document.createElement("div");
-        heading.textContent = "Y2JB Autoloader";
-        Object.assign(heading.style, {
-            fontSize: "34px", lineHeight: "1.05", fontWeight: "700", color: "#fff",
-            textShadow: "0 0 22px rgba(140,180,255,.16)"
-        });
-        headingWrap.appendChild(heading);
-        const version = document.createElement("div");
-        version.textContent = "v" + autoloader_version + "  •  by itsPLK";
-        Object.assign(version.style, {
-            fontSize: "17px", letterSpacing: "1.5px", color: "rgba(222,231,249,.68)"
-        });
-        headingWrap.appendChild(version);
-
-        const credit = document.createElement("div");
-	credit.textContent = "design by raveN";
-	Object.assign(credit.style, {
-    	flex: "0 0 auto",
-    	whiteSpace: "nowrap",
-    	display: "block",
-    	minWidth: "180px",
-    	textAlign: "right",
-    	fontSize: "18px",
-    	letterSpacing: "1px",
-    	fontWeight: "600",
-    	color: "rgba(244,248,255,.92)",
-    	textShadow: "0 0 16px rgba(135,180,255,.85)"
-	});
-	header.appendChild(credit);
-
-
         // Central animated jailbreak loader.
         const emblem = document.createElement("div");
         Object.assign(emblem.style, {
@@ -256,18 +180,6 @@ function trigger() {
             mask: "radial-gradient(closest-side, transparent calc(100% - 16px), #000 calc(100% - 15px))",
         });
         emblem.appendChild(ring);
-
-        const innerRing = document.createElement("div");
-        innerRing.id = "jailbreakInnerRing";
-        Object.assign(innerRing.style, {
-            position: "absolute",
-            width: "270px", height: "270px",
-            borderRadius: "50%", boxSizing: "border-box",
-            border: "2px solid rgba(255,255,255,.25)",
-            boxShadow: "inset 0 0 28px rgba(255,255,255,.08), 0 0 22px rgba(255,255,255,.15)",
-            animation: "jailbreakInnerPulse 1.2s ease-in-out infinite"
-        });
-        emblem.appendChild(innerRing);
 
         const animationStyle = document.createElement("style");
         animationStyle.textContent = `
@@ -323,12 +235,12 @@ function trigger() {
         const statusPanel = document.createElement("div");
         statusPanel.id = "logWrapper";
         Object.assign(statusPanel.style, {
-            position: "absolute", left: "50%", top: "75%", transform: "translateX(-50%)",
-            width: "1120px", height: "66px", boxSizing: "border-box", padding: "0 28px",
+            position: "absolute", left: "7.6%", top: "66.3%", transform: "none",
+            width: "84.8%", height: "5.6%", boxSizing: "border-box", padding: "0 28px",
             display: "flex", alignItems: "center",
-            background: "linear-gradient(90deg,rgba(5,11,23,.82),rgba(18,31,55,.78),rgba(5,11,23,.82))",
-            border: "1px solid rgba(197,218,255,.30)", borderRadius: "13px",
-            boxShadow: "0 0 28px rgba(73,128,220,.13),inset 0 1px 0 rgba(255,255,255,.06)",
+            background: "transparent",
+            border: "none", borderRadius: "0",
+            boxShadow: "none",
             overflow: "hidden", zIndex: "3"
         });
         root.appendChild(statusPanel);
@@ -408,7 +320,7 @@ function trigger() {
     try {
         if (typeof window.autoloader_ui === 'function') {
             window.autoloader_ui();
-            window.uiLog("Y2JB Autoloader " + autoloader_version + " by PLK", "success");
+            window.uiLog("Jailbreak - Loading", "info");
             window.updateProgress(0, "Running userland exploit...");
 
         }
@@ -1345,7 +1257,6 @@ function trigger() {
         // Success styling is applied only after the existing jailbreak checks and autoload.
         const successStatus = document.getElementById("jailbreakStatus");
         const successRing = document.getElementById("jailbreakRing");
-        const successMark = document.getElementById("jailbreakMark");
         const successLabel = document.getElementById("progressLabel");
         const successLog = document.getElementById("logContainer");
         const successDot = document.querySelector("#logWrapper > div");
@@ -1363,13 +1274,6 @@ function trigger() {
             successRing.style.filter = "drop-shadow(0 0 14px rgba(80,255,140,.85))";
         }
 
-        const successInnerRing = document.getElementById("jailbreakInnerRing");
-        if (successInnerRing) {
-            successInnerRing.style.animation = "none";
-            successInnerRing.style.opacity = "1";
-            successInnerRing.style.borderColor = "rgba(118,255,155,.8)";
-            successInnerRing.style.boxShadow = "inset 0 0 30px rgba(80,255,140,.2), 0 0 30px rgba(80,255,140,.4)";
-        }
 
         if (successStatus) {
             successStatus.classList.remove("loading");
