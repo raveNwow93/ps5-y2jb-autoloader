@@ -266,13 +266,13 @@ function trigger() {
             display: "flex", alignItems: "center", justifyContent: "center",
             boxShadow: "0 0 30px rgba(255,255,255,.24)"
         });
-        const triangle = document.createElement("div");
-        Object.assign(triangle.style, {
+        const logoTriangle = document.createElement("div");
+        Object.assign(logoTriangle.style, {
             width: "0", height: "0", marginLeft: "7px",
             borderTop: "17px solid transparent", borderBottom: "17px solid transparent",
             borderLeft: "27px solid #080808"
         });
-        mark.appendChild(triangle);
+        mark.appendChild(logoTriangle);
         emblem.appendChild(mark);
         ring.style.animation = "jailbreakPulse 2.4s ease-in-out infinite";
 
