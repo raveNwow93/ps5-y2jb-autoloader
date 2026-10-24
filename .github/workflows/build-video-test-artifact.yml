@@ -1,4 +1,4 @@
-﻿name: Build video-only test artifact
+name: Build video-only test artifact
 
 on:
   workflow_dispatch:
@@ -34,6 +34,9 @@ jobs:
           mkdir -p "$splash_dir"
           unzip -q y2jb_update.zip -d "$splash_dir"
           rm -f "$splash_dir/update-info.txt"
+          test -s src/assets/background.mp4
+          cmp -s src/assets/background.mp4 "$splash_dir/assets/background.mp4"
+          echo "PASS: assembled background.mp4 matches source"
           test -s "$splash_dir/video-test.html"
           cp "$splash_dir/video-test.html" "$splash_dir/splash.html"
           rm "$splash_dir/video-test.html"
@@ -55,7 +58,18 @@ jobs:
             find /mnt/cache/splash_screen -type f \( -name 'splash.html' -o -name 'background.mp4' -o -name 'ui.css' \) -exec ls -ln {} \;
             test -f /mnt/cache/splash_screen/aHR0cHM6Ly93d3cueW91dHViZS5jb20vdHY=/splash.html
             test -s /mnt/cache/splash_screen/aHR0cHM6Ly93d3cueW91dHViZS5jb20vdHY=/assets/background.mp4
-            echo "PASS: splash.html and non-empty background.mp4 exist in UFS2"
+            echo "=== UFS2 splash.html content ==="
+            cat /mnt/cache/splash_screen/aHR0cHM6Ly93d3cueW91dHViZS5jb20vdHY=/splash.html
+            if grep -q 'main.js' /mnt/cache/splash_screen/aHR0cHM6Ly93d3cueW91dHViZS5jb20vdHY=/splash.html; then
+              echo "FAIL: test splash.html still references main.js"
+              umount /mnt
+              mdconfig -d -u "${MD}"
+              exit 1
+            fi
+            grep -q 'assets/background.mp4' /mnt/cache/splash_screen/aHR0cHM6Ly93d3cueW91dHViZS5jb20vdHY=/splash.html
+            grep -q 'Y2JB MEDIA DIAGNOSTICS' /mnt/cache/splash_screen/aHR0cHM6Ly93d3cueW91dHViZS5jb20vdHY=/splash.html
+            grep -q 'canPlayType' /mnt/cache/splash_screen/aHR0cHM6Ly93d3cueW91dHViZS5jb20vdHY=/splash.html
+            echo "PASS: diagnostic splash verified in UFS2; background.mp4 is present"
             umount /mnt
             mdconfig -d -u "${MD}"
 
@@ -71,5 +85,3 @@ jobs:
           path: |
             y2jb_update.zip
             download0.dat
-
-
