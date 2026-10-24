@@ -49,10 +49,10 @@ jobs:
             cp -R download0/. /mnt/
             chmod -R 777 /mnt
             echo "=== UFS2 splash file verification ==="
-            find /mnt/cache/splash_screen -type f \( -name 'splash.html' -o -name 'background.mp4' -o -name 'ui.css' \) -exec ls -ln {} \;
+            find /mnt/cache/splash_screen -type f \( -name 'splash.html' -o -name 'background.png' -o -name 'ui.css' \) -exec ls -ln {} \;
             test -f /mnt/cache/splash_screen/aHR0cHM6Ly93d3cueW91dHViZS5jb20vdHY=/splash.html
-            test -s /mnt/cache/splash_screen/aHR0cHM6Ly93d3cueW91dHViZS5jb20vdHY=/assets/background.mp4
-            echo "PASS: splash.html and non-empty background.mp4 exist in UFS2"
+            test -s /mnt/cache/splash_screen/aHR0cHM6Ly93d3cueW91dHViZS5jb20vdHY=/assets/background.png
+            echo "PASS: splash.html and non-empty background.png exist in UFS2"
             umount /mnt
             mdconfig -d -u "${MD}"
 

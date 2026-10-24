@@ -1,4 +1,4 @@
-﻿:root {
+:root {
     --ui-scale: 1;
     --white: #f5f7ff;
     --muted: rgba(235, 240, 255, 0.72);
@@ -20,14 +20,13 @@ html, body {
     font-family: Arial, Helvetica, sans-serif;
 }
 
-.background-video {
+.background-image {
     position: fixed;
     inset: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;
     z-index: 0;
-    background: #05070c;
+    background: #05070c url("assets/background.png") center center / cover no-repeat;
 }
 
 .background-shade {
@@ -212,4 +211,48 @@ html, body {
     font-size: 13px;
     letter-spacing: 3px;
     text-transform: uppercase;
+}
+
+
+/* Circular Y2JB progress ring */
+#y2jb-ring {
+    position: absolute;
+    left: 50%;
+    top: 266px;
+    width: 240px;
+    height: 240px;
+    transform: translateX(-50%);
+    pointer-events: none;
+    z-index: 4;
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.75))
+            drop-shadow(0 0 14px rgba(255, 255, 255, 0.28));
+}
+
+#y2jb-ring svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    transform: rotate(-90deg);
+}
+
+#y2jb-ring circle {
+    fill: none;
+    stroke-width: 7;
+}
+
+#y2jb-ring .ring-track {
+    stroke: rgba(255, 255, 255, 0.20);
+}
+
+#y2jb-ring .ring-progress {
+    stroke: #ffffff;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 220ms ease, stroke 220ms ease;
+}
+
+.y2jb-header,
+.y2jb-mark,
+.progress-area {
+    display: none !important;
 }

@@ -65,7 +65,7 @@ async function start_update() {
                   createdDirs.add(cur);
                   log("mkdir created: " + cur);
               } else {
-                  // if ret < 0, possible errno (e.g. EEXIST) — check stat again
+                  // if ret < 0, possible errno (e.g. EEXIST) - check stat again
                   const stat_buf2 = malloc(0x200n);
                   const st2 = syscall(SYSCALL.stat, addr, stat_buf2);
                   if (st2 === 0n) {
@@ -552,6 +552,7 @@ async function updateIcon() {
       if (file_exists(path)) {
         log("Found Y2JB update file at: " + path);
         send_notification("Found Y2JB update file at: " + path);
+        if (typeof window.setRingState === 'function') window.setRingState("update");
         updateFound = true;
         updatePath = path;
           break;
@@ -663,7 +664,14 @@ async function updateIcon() {
       ensureDirectoryExists(outDir);
 
       let count = 0;
+      let processedEntries = 0;
+      const totalEntries = Math.max(keys.length, 1);
       for (const name of keys) {
+        processedEntries++;
+        const extractionPercent = Math.min(95, 50 + Math.floor((processedEntries / totalEntries) * 45));
+        if (typeof window.updateProgress === "function") {
+          window.updateProgress(extractionPercent, "Updating Y2JB...");
+        }
 
         const data = entries[name];
         if (!(data instanceof Uint8Array)) {

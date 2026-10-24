@@ -144,9 +144,6 @@ function trigger() {
 (async function() {
     const original_log = window.log || log;
     window.log = async function(msg) {
-        if (typeof msg === 'string' && (msg.includes("[ERROR]") || msg.includes("[-]"))) {
-            if (typeof window.hideUI === 'function') window.hideUI();
-        }
         if (typeof original_log === 'function') {
             return await original_log(msg);
         }
@@ -188,6 +185,10 @@ function trigger() {
         mark.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5z"/></svg>';
         ui.appendChild(mark);
 
+        const ring = document.createElement("div");
+        ring.id = "y2jb-ring";
+        ring.innerHTML = '<svg viewBox="0 0 240 240" aria-hidden="true"><circle class="ring-track" cx="120" cy="120" r="108"></circle><circle id="ringProgress" class="ring-progress" cx="120" cy="120" r="108"></circle></svg>';
+        ui.appendChild(ring);
         const status = document.createElement("div");
         status.id = "progressLabel";
         status.className = "y2jb-status";
@@ -253,8 +254,26 @@ function trigger() {
         window.addEventListener("resize", resizeUI);
     };
 
+    window.setRingState = function(state) {
+        const ring = document.getElementById("ringProgress");
+        if (!ring) return;
+        const colors = {
+            loading: "#ffffff",
+            update: "#ffd43b",
+            success: "#39e879",
+            error: "#ff4055"
+        };
+        ring.style.stroke = colors[state] || colors.loading;
+    };
     window.updateProgress = function(percent, message="Loading...") {
         const safePercent = Math.max(0, Math.min(100, Number(percent) || 0));
+        const ringProgress = document.getElementById("ringProgress");
+        if (ringProgress) {
+            const circumference = 2 * Math.PI * 108;
+            ringProgress.style.strokeDasharray = String(circumference);
+            ringProgress.style.strokeDashoffset = String(circumference * (1 - safePercent / 100));
+        }
+
         const progressBar = document.getElementById("progressBar");
         if (progressBar) {
             progressBar.style.transform = "scaleX(" + (safePercent / 100) + ")";
@@ -274,10 +293,6 @@ function trigger() {
     };
 
     window.uiLog = function(message, type="info") {
-        if (typeof message === "string" &&
-            (message.includes("[ERROR]") || message.includes("[-]"))) {
-            if (typeof window.hideUI === "function") window.hideUI();
-        }
 
         const logContainer = document.getElementById("logContainer");
         if (!logContainer) return;
@@ -1213,11 +1228,17 @@ function trigger() {
             exploit_success = await start_relapse();
         } else {
             send_notification("[ERROR] Unsupported fw: " + FW_VERSION);
+            if (typeof window.setRingState === "function") window.setRingState("error");
+            if (typeof window.updateProgress === "function") window.updateProgress(0, "Unsupported firmware");
+            await sleep(1500);
             await kill_youtube(5000);
             return;
         }
 
         if (!exploit_success) {
+            if (typeof window.setRingState === "function") window.setRingState("error");
+            if (typeof window.updateProgress === "function") window.updateProgress(0, "Exploit failed");
+            await sleep(1500);
             await kill_youtube(5000);
             return;
         }
@@ -1227,10 +1248,17 @@ function trigger() {
         }
 
         if (!is_jailbroken()) {
+            if (typeof window.setRingState === "function") window.setRingState("error");
+            if (typeof window.updateProgress === "function") window.updateProgress(50, "Jailbreak failed");
             send_notification("[ERROR] Jailbreak failed");
+            await sleep(1500);
             await kill_youtube(5000);
             return;
         }
+
+        if (typeof window.setRingState === "function") window.setRingState("success");
+        if (typeof window.updateProgress === "function") window.updateProgress(100, "Jailbreak confirmed");
+        await sleep(1500);
 
         await start_update();
         await sleep(1000);
@@ -1241,7 +1269,9 @@ function trigger() {
         }
 
     } catch (e) {                
-        if (typeof window.hideUI === 'function') window.hideUI();
+        if (typeof window.setRingState === "function") window.setRingState("error");
+        if (typeof window.updateProgress === "function") window.updateProgress(0, "Unexpected error");
+        await sleep(1500);
         await log('EXCEPTION: ' + e.message);
         await log(e.stack);
         await kill_youtube();
