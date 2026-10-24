@@ -12,30 +12,6 @@
         <source src="assets/background.mp4" type="video/mp4">
     </video>
     <div class="background-shade"></div>
-    <div id="video-diagnostics" style="position:fixed;z-index:9999;left:12px;bottom:12px;padding:10px;background:rgba(0,0,0,.85);color:#fff;font:14px monospace;white-space:pre-wrap;max-width:90vw">
-        VIDEO TEST: initializing...
-    </div>
-    <script>
-    (() => {
-        const v = document.getElementById("backgroundVideo");
-        const out = document.getElementById("video-diagnostics");
-        const report = (eventName) => {
-            out.textContent = [
-                "VIDEO: " + eventName,
-                "readyState=" + v.readyState + " networkState=" + v.networkState,
-                "time=" + v.currentTime.toFixed(2) + " size=" + v.videoWidth + "x" + v.videoHeight,
-                "canPlay=" + v.canPlayType("video/mp4"),
-                "error=" + (v.error ? v.error.code + " " + v.error.message : "none")
-            ].join("\n");
-        };
-        ["loadstart","loadedmetadata","loadeddata","canplay","playing","stalled","abort","emptied","error"].forEach(
-            name => v.addEventListener(name, () => report(name))
-        );
-        report("script initialized");
-        v.play().catch(e => { report("play rejected: " + e.name + " " + e.message); });
-    })();
-    </script>
     <script src="main.js"></script>
 </body>
 </html>
-
