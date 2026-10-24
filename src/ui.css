@@ -1,0 +1,215 @@
+﻿:root {
+    --ui-scale: 1;
+    --white: #f5f7ff;
+    --muted: rgba(235, 240, 255, 0.72);
+    --glass: rgba(5, 8, 16, 0.66);
+    --line: rgba(255, 255, 255, 0.2);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    background: #05070c;
+    color: var(--white);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+.background-video {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: 0;
+    background: #05070c;
+}
+
+.background-shade {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(
+        180deg,
+        rgba(2, 4, 10, 0.18) 0%,
+        rgba(2, 4, 10, 0.05) 42%,
+        rgba(2, 4, 10, 0.5) 100%
+    );
+}
+
+#autoloader_ui {
+    position: fixed;
+    z-index: 2;
+    width: 1920px;
+    height: 1080px;
+    transform-origin: top left;
+    overflow: hidden;
+    background: transparent;
+    color: var(--white);
+    pointer-events: none;
+}
+
+.y2jb-header {
+    position: absolute;
+    top: 82px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+}
+
+.y2jb-title {
+    margin: 0;
+    font-size: 34px;
+    font-weight: 600;
+    letter-spacing: 9px;
+    text-transform: uppercase;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, 0.7);
+}
+
+.y2jb-subtitle {
+    margin-top: 13px;
+    color: var(--muted);
+    font-size: 16px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+}
+
+.y2jb-mark {
+    position: absolute;
+    top: 330px;
+    left: 50%;
+    width: 112px;
+    height: 112px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(-50%);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 0 65px rgba(220, 232, 255, 0.22);
+}
+
+.y2jb-mark svg {
+    width: 48px;
+    height: 48px;
+    fill: #080b12;
+}
+
+.y2jb-status {
+    position: absolute;
+    top: 600px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-size: 24px;
+    font-weight: 500;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 16px #000;
+}
+
+.progress-area {
+    position: absolute;
+    top: 680px;
+    left: 50%;
+    width: 760px;
+    transform: translateX(-50%);
+}
+
+.progress-track {
+    width: 100%;
+    height: 5px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.22);
+    box-shadow: 0 0 18px rgba(255, 255, 255, 0.08);
+}
+
+#progressBar {
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.35s ease;
+    box-shadow: 0 0 14px rgba(255, 255, 255, 0.65);
+}
+
+.progress-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+    color: var(--muted);
+    font-size: 14px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
+
+#progressPercent {
+    color: var(--white);
+    font-variant-numeric: tabular-nums;
+}
+
+.log-panel {
+    position: absolute;
+    left: 50%;
+    top: 790px;
+    width: 760px;
+    height: 112px;
+    padding: 15px 20px;
+    overflow: hidden;
+    transform: translateX(-50%);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--glass);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(8px);
+    font-family: Consolas, monospace;
+    font-size: 15px;
+    line-height: 24px;
+}
+
+#logContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+}
+
+.log-entry {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: rgba(240, 244, 255, 0.82);
+}
+
+.log-entry.success {
+    color: #d9ffe5;
+}
+
+.log-entry.warning {
+    color: #fff;
+}
+
+.log-entry.error {
+    color: #ffbcbc;
+}
+
+.y2jb-credit {
+    position: absolute;
+    bottom: 52px;
+    left: 0;
+    width: 100%;
+    color: rgba(255, 255, 255, 0.55);
+    text-align: center;
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}

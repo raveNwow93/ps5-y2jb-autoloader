@@ -77,20 +77,37 @@ const leftPadding = Math.floor((baseWidth * 0.005) * scale);
 const topPadding = Math.floor((baseHeight * 0.005) * scale);
 
 async function log(msg) {
-    const message = String(msg);
-
-    if (typeof window.uiLog === 'function') {
-        const displayMessage = message.replace(/[\r\n]+/g, ' ').trim();
-        const type = /\[ERROR\]|\[-\]/.test(message) ? 'error' : 'info';
-        window.uiLog(displayMessage || '\u00A0', type);
+    let message = String(msg);
+    if (!outputElement) {
+        outputElement = document.getElementById('output');
+        if (!outputElement) {
+            outputElement = document.createElement('div');
+            outputElement.id = 'output';
+            document.body.appendChild(outputElement);
+        }
+        outputElement.style.paddingLeft = leftPadding + 'px';
+        outputElement.style.paddingTop = topPadding + 'px'; 
     }
-
+    
+    const lines = message.split('\n');
+    lines.forEach(line => {
+        let lineDiv = document.createElement('div');
+        lineDiv.textContent = line === '' ? '\u00A0' : line;
+        lineDiv.style.fontSize = fontSize + 'px';
+        
+        outputElement.appendChild(lineDiv);
+    });
+    
+    while (outputElement.children.length > maxLines) {
+        outputElement.removeChild(outputElement.children[0]);
+    }
+    
     await new Promise(resolve => {
         requestAnimationFrame(() => {
             setTimeout(resolve, 1);
         });
     });
-
+        
     if (NETWORK_LOGGING) {
         try {
             await fetch(LOG_SERVER, {
@@ -100,6 +117,7 @@ async function log(msg) {
         } catch (e) { }
     }
 }
+
 function toHex(num) {
     return '0x' + BigInt(num).toString(16).padStart(16, '0');
 }
@@ -135,132 +153,162 @@ function trigger() {
     };
 
     window.autoloader_ui = function() {
-        const previous = document.getElementById("autoloader_ui");
-        if (previous && previous.parentNode) previous.parentNode.removeChild(previous);
+        const oldUI = document.getElementById("autoloader_ui");
+        if (oldUI) oldUI.remove();
 
-        const W = 1920, H = 1080;
-        const scale = window.innerWidth / W;
-        const root = document.createElement("div");
-        root.id = "autoloader_ui";
-        Object.assign(root.style, {
-            position: "fixed", top: "0", left: "0", width: W + "px", height: H + "px",
-            transform: "scale(" + scale + ")", transformOrigin: "top left",
-            zIndex: "9999", overflow: "hidden", fontFamily: "Arial, Helvetica, sans-serif",
-            color: "#f7f8ff",
-            backgroundColor: "#020305",
-            backgroundImage: "url('y2jb-background.png')",
-            backgroundSize: "100% 100%",
-            backgroundPosition: "center center",
-            backgroundRepeat: "no-repeat"
-        });
+        const baseWidth = 1920;
+        const baseHeight = 1080;
+        const scale = Math.min(
+            window.innerWidth / baseWidth,
+            window.innerHeight / baseHeight
+        );
 
-        // Central animated jailbreak loader.
-        const emblem = document.createElement("div");
-        Object.assign(emblem.style, {
-            position: "absolute", left: "50%", top: "45%",
-            width: "460px", height: "460px",
-            transform: "translate(-50%,-50%)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            opacity: "1", zIndex: "2", pointerEvents: "none"
-        });
-        root.appendChild(emblem);
+        const ui = document.createElement("div");
+        ui.id = "autoloader_ui";
+        ui.style.left = ((window.innerWidth - baseWidth * scale) / 2) + "px";
+        ui.style.top = ((window.innerHeight - baseHeight * scale) / 2) + "px";
+        ui.style.transform = "scale(" + scale + ")";
 
-        const ring = document.createElement("div");
-        ring.id = "jailbreakRing";
-        Object.assign(ring.style, {
-            position: "absolute",
-            width: "320px", height: "320px",
-            boxSizing: "border-box", borderRadius: "50%",
-            border: "12px solid transparent",
-            background: "conic-gradient(from -90deg, #fff 0deg, #fff 0deg, rgba(255,255,255,.12) 0deg, rgba(255,255,255,.12) 360deg)",
-            boxShadow: "0 0 22px rgba(255,255,255,.65), 0 0 55px rgba(255,255,255,.38), 0 0 100px rgba(255,255,255,.16)",
-            filter: "drop-shadow(0 0 10px rgba(255,255,255,.75))",
-            animation: "jailbreakGlow 1.4s ease-in-out infinite",
-            WebkitMask: "radial-gradient(closest-side, transparent calc(100% - 16px), #000 calc(100% - 15px))",
-            mask: "radial-gradient(closest-side, transparent calc(100% - 16px), #000 calc(100% - 15px))",
-        });
-        emblem.appendChild(ring);
+        const header = document.createElement("div");
+        header.className = "y2jb-header";
 
-        const animationStyle = document.createElement("style");
-        animationStyle.textContent = `
-            @keyframes jailbreakGlow {
-                0%, 100% { filter: drop-shadow(0 0 9px rgba(255,255,255,.55)); }
-                50% { filter: drop-shadow(0 0 22px rgba(255,255,255,.95)); }
-            }
-            @keyframes jailbreakInnerPulse {
-                0%, 100% {
-                    opacity: .45;
-                    box-shadow: inset 0 0 18px rgba(255,255,255,.04), 0 0 12px rgba(255,255,255,.12);
-                }
-                50% {
-                    opacity: 1;
-                    box-shadow: inset 0 0 30px rgba(255,255,255,.12), 0 0 28px rgba(255,255,255,.32);
-                }
-            }
-            @keyframes jailbreakTextBlink {
-                0%, 100% { opacity: 1; }
-                50% { opacity: .28; }
-            }
-            #jailbreakStatus.loading {
-                animation: jailbreakTextBlink 1.2s ease-in-out infinite;
-            }
-        `;
-        root.appendChild(animationStyle);
+        const title = document.createElement("h1");
+        title.className = "y2jb-title";
+        title.textContent = "Y2JB AUTOLOADER";
+        header.appendChild(title);
 
-        const centralStatus = document.createElement("div");
-        centralStatus.id = "jailbreakStatus";
-        centralStatus.className = "loading";
-        centralStatus.textContent = "Jailbreak - Loading";
-        Object.assign(centralStatus.style, {
-            position: "absolute", left: "50%", top: "45%",
-            transform: "translate(-50%,-50%)",
-            width: "600px", textAlign: "center",
-            fontSize: "25px", fontWeight: "700",
-            letterSpacing: "3px", color: "#fff",
-            textShadow: "0 0 12px rgba(255,255,255,.9), 0 0 28px rgba(255,255,255,.65), 0 0 48px rgba(255,255,255,.28)",
-            zIndex: "3", pointerEvents: "none"
-        });
-        root.appendChild(centralStatus);
+        const subtitle = document.createElement("div");
+        subtitle.className = "y2jb-subtitle";
+        subtitle.textContent = "EXPLOIT INITIALIZATION";
+        header.appendChild(subtitle);
+        ui.appendChild(header);
 
-        // Status and progress are displayed inside the central circular ring.
-        document.body.appendChild(root);
+        const mark = document.createElement("div");
+        mark.className = "y2jb-mark";
+        mark.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10-6.5z"/></svg>';
+        ui.appendChild(mark);
+
+        const status = document.createElement("div");
+        status.id = "progressLabel";
+        status.className = "y2jb-status";
+        status.textContent = "Initializing...";
+        ui.appendChild(status);
+
+        const progressArea = document.createElement("div");
+        progressArea.className = "progress-area";
+
+        const track = document.createElement("div");
+        track.className = "progress-track";
+
+        const bar = document.createElement("div");
+        bar.id = "progressBar";
+        track.appendChild(bar);
+        progressArea.appendChild(track);
+
+        const meta = document.createElement("div");
+        meta.className = "progress-meta";
+
+        const progressText = document.createElement("span");
+        progressText.textContent = "PROGRESS";
+        meta.appendChild(progressText);
+
+        const percent = document.createElement("span");
+        percent.id = "progressPercent";
+        percent.textContent = "0%";
+        meta.appendChild(percent);
+
+        progressArea.appendChild(meta);
+        ui.appendChild(progressArea);
+
+        const logPanel = document.createElement("div");
+        logPanel.id = "logWrapper";
+        logPanel.className = "log-panel";
+
+        const logContainer = document.createElement("div");
+        logContainer.id = "logContainer";
+        logPanel.appendChild(logContainer);
+        ui.appendChild(logPanel);
+
+        const credit = document.createElement("div");
+        credit.className = "y2jb-credit";
+        credit.textContent = "design by raveN";
+        ui.appendChild(credit);
+
+        document.body.appendChild(ui);
+
+        const resizeUI = function() {
+            const nextScale = Math.min(
+                window.innerWidth / baseWidth,
+                window.innerHeight / baseHeight
+            );
+            ui.style.left = ((window.innerWidth - baseWidth * nextScale) / 2) + "px";
+            ui.style.top = ((window.innerHeight - baseHeight * nextScale) / 2) + "px";
+            ui.style.transform = "scale(" + nextScale + ")";
+        };
+
+        if (window.__y2jbResizeHandler) {
+            window.removeEventListener("resize", window.__y2jbResizeHandler);
+        }
+        window.__y2jbResizeHandler = resizeUI;
+        window.addEventListener("resize", resizeUI);
     };
 
     window.updateProgress = function(percent, message="Loading...") {
         const safePercent = Math.max(0, Math.min(100, Number(percent) || 0));
-        const ring = document.getElementById("jailbreakRing");
-        const status = document.getElementById("jailbreakStatus");
+        const progressBar = document.getElementById("progressBar");
+        if (progressBar) {
+            progressBar.style.transform = "scaleX(" + (safePercent / 100) + ")";
+        }
 
-        if (ring) {
-            const degrees = safePercent * 3.6;
-            ring.style.background =
-                "conic-gradient(from -90deg, #fff 0deg, #fff " + degrees +
-                "deg, rgba(255,255,255,.12) " + degrees +
-                "deg, rgba(255,255,255,.12) 360deg)";
+        const progressPercent = document.getElementById("progressPercent");
+        if (progressPercent) {
+            progressPercent.textContent = Math.round(safePercent) + "%";
         }
-        if (status) {
-            status.textContent = String(message);
-            status.style.fontSize = "21px";
-            status.style.letterSpacing = "1px";
+
+        const progressLabel = document.getElementById("progressLabel");
+        if (progressLabel) {
+            progressLabel.textContent = message;
         }
+
         window.uiLog(message, "warning");
     };
 
     window.uiLog = function(message, type="info") {
-        if (typeof message === "string" && (message.includes("[ERROR]") || message.includes("[-]"))) {
+        if (typeof message === "string" &&
+            (message.includes("[ERROR]") || message.includes("[-]"))) {
             if (typeof window.hideUI === "function") window.hideUI();
+        }
+
+        const logContainer = document.getElementById("logContainer");
+        if (!logContainer) return;
+
+        const entry = document.createElement("div");
+        entry.className = "log-entry " + (
+            type === "error" ? "error" :
+            type === "success" ? "success" :
+            type === "warning" ? "warning" : "info"
+        );
+        entry.textContent = String(message);
+        logContainer.appendChild(entry);
+
+        while (logContainer.childElementCount > 3) {
+            logContainer.removeChild(logContainer.firstChild);
         }
     };
 
     window.hideUI = function() {
-        const existing = document.getElementById("autoloader_ui");
-        if (existing && existing.parentNode) existing.parentNode.removeChild(existing);
-    };
+        const ui = document.getElementById("autoloader_ui");
+        if (ui) ui.remove();
 
+        if (window.__y2jbResizeHandler) {
+            window.removeEventListener("resize", window.__y2jbResizeHandler);
+            window.__y2jbResizeHandler = null;
+        }
+    };
     try {
         if (typeof window.autoloader_ui === 'function') {
             window.autoloader_ui();
-            window.uiLog("Jailbreak - Loading", "info");
+            window.uiLog("Y2JB Autoloader " + autoloader_version + " by PLK", "success");
             window.updateProgress(0, "Running userland exploit...");
 
         }
@@ -1144,7 +1192,6 @@ function trigger() {
         await load_localscript('lapse.js');
         await load_localscript('relapse.js');
         await load_localscript('update.js');
-        await load_localscript('icon_update.js');
         await load_localscript('autoload.js');
         if (typeof window.updateProgress === 'function') {
             window.updateProgress(20, "Running kernel exploit...");
@@ -1153,7 +1200,7 @@ function trigger() {
         let exploit_success = false;
 
         const has_net = has_network_interface();
-        const relapse_supported = compare_version(FW_VERSION, "8.00") >= 0 &&
+        const relapse_supported = compare_version(FW_VERSION, "7.00") >= 0 &&
                                   compare_version(FW_VERSION, "13.60") <= 0 &&
                                   FW_VERSION !== "9.05" &&
                                   FW_VERSION !== "11.40";
@@ -1186,34 +1233,11 @@ function trigger() {
         }
 
         await start_update();
-        await start_icon_update();
         await sleep(1000);
         await start_autoload();
 
         if (typeof window.updateProgress === 'function') {
-            window.updateProgress(100, "Process complete • 100%");
-        }
-
-        // Success styling is applied only after the existing jailbreak checks and autoload.
-        const successStatus = document.getElementById("jailbreakStatus");
-        const successRing = document.getElementById("jailbreakRing");
-
-        if (successStatus) {
-            successStatus.textContent = "Jailbreak - Success";
-            successStatus.style.color = "#8dffb0";
-            successStatus.style.textShadow = "0 0 14px rgba(80,255,140,.8), 0 0 32px rgba(80,255,140,.38)";
-        }
-        if (successRing) {
-            successRing.style.animation = "none";
-            successRing.style.background = "conic-gradient(from 0deg, #8dffb0, #37e875, #d8ffe3, #37e875, #8dffb0)";
-            successRing.style.borderColor = "#76ff9b";
-            successRing.style.boxShadow = "0 0 28px rgba(80,255,140,.8), 0 0 70px rgba(80,255,140,.5), 0 0 110px rgba(80,255,140,.22)";
-            successRing.style.filter = "drop-shadow(0 0 14px rgba(80,255,140,.85))";
-        }
-
-
-        if (successStatus) {
-            successStatus.classList.remove("loading");
+            window.updateProgress(100, "Autoload finished.");
         }
 
     } catch (e) {                

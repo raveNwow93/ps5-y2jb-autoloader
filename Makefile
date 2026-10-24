@@ -1,5 +1,4 @@
-VERSION    := 1.0.1
-
+VERSION    := 1.0.3
 # Git info for versioning
 GIT_HASH   := $(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown")
 GIT_DIRTY  := $(shell git status --porcelain 2>/dev/null)
@@ -33,3 +32,4 @@ clean:
 .PHONY: all clean print-version
 print-version:
 	@echo $(RELEASE_VERSION)
+
