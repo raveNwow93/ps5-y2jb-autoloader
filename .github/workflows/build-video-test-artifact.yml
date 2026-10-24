@@ -1,0 +1,75 @@
+﻿name: Build video-only test artifact
+
+on:
+  workflow_dispatch:
+
+# Artifact-only workflow: no releases, tags, or repository writes.
+permissions:
+  contents: read
+
+jobs:
+  build-download0:
+    name: Build video-only test image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out this branch and pinned submodules
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      - name: Build update package
+        run: bash ./build.sh --dev --download-deps
+
+      - name: Assemble YouTube download0 tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          splash_dir='download0/cache/splash_screen/aHR0cHM6Ly93d3cueW91dHViZS5jb20vdHY='
+          mkdir -p "$splash_dir"
+          unzip -q y2jb_update.zip -d "$splash_dir"
+          rm -f "$splash_dir/update-info.txt"
+          test -s "$splash_dir/video-test.html"
+          cp "$splash_dir/video-test.html" "$splash_dir/splash.html"
+          rm "$splash_dir/video-test.html"
+
+      - name: Create UFS2 download0.dat in FreeBSD
+        uses: vmactions/freebsd-vm@v1
+        with:
+          release: "14.2"
+          copyback: true
+          run: |
+            set -eu
+            truncate -s 336789504 download0.dat
+            MD=$(mdconfig -a -t vnode -f "$(pwd)/download0.dat")
+            newfs -O 2 -b 32768 -f 4096 "/dev/${MD}"
+            mount "/dev/${MD}" /mnt
+            cp -R download0/. /mnt/
+            chmod -R 777 /mnt
+            echo "=== UFS2 splash file verification ==="
+            find /mnt/cache/splash_screen -type f \( -name 'splash.html' -o -name 'background.mp4' -o -name 'ui.css' \) -exec ls -ln {} \;
+            test -f /mnt/cache/splash_screen/aHR0cHM6Ly93d3cueW91dHViZS5jb20vdHY=/splash.html
+            test -s /mnt/cache/splash_screen/aHR0cHM6Ly93d3cueW91dHViZS5jb20vdHY=/assets/background.mp4
+            echo "PASS: splash.html and non-empty background.mp4 exist in UFS2"
+            umount /mnt
+            mdconfig -d -u "${MD}"
+
+      - name: Verify the image
+        run: file download0.dat
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: y2jb-video-test-${{ github.run_number }}
+          if-no-files-found: error
+          retention-days: 14
+          path: |
+            y2jb_update.zip
+            download0.dat
+
+
