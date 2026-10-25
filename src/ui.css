@@ -256,3 +256,8 @@ html, body {
 .progress-area {
     display: none !important;
 }
+
+/* Build 22: hide the visual log panel; keep diagnostic logging active */
+#autoloader_ui .log-panel {
+    display: none !important;
+}

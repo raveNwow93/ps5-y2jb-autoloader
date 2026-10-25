@@ -187,7 +187,7 @@ function trigger() {
 
         const ring = document.createElement("div");
         ring.id = "y2jb-ring";
-        ring.innerHTML = '<svg viewBox="0 0 240 240" aria-hidden="true"><circle class="ring-track" cx="120" cy="120" r="108"></circle><circle id="ringProgress" class="ring-progress" cx="120" cy="120" r="108"></circle></svg>';
+        ring.innerHTML = '<svg viewBox="0 0 240 240" aria-hidden="true" style="display:block;width:240px;height:240px;overflow:visible;transform:rotate(-90deg)"><circle class="ring-track" cx="120" cy="120" r="108" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="7"></circle><circle id="ringProgress" class="ring-progress" cx="120" cy="120" r="108" fill="none" stroke="#ffffff" stroke-width="7" stroke-linecap="round" stroke-dasharray="678.584" stroke-dashoffset="678.584"></circle></svg>';
         ui.appendChild(ring);
         const status = document.createElement("div");
         status.id = "progressLabel";
